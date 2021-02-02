@@ -12,30 +12,23 @@ function Tree(props) {
 
   return (
     <div key={(props.tree[0] && props.tree[0].id) || "0"} className="Tree">
-      <section>
+      <section className="main">
         <div>
           <ul>
             {/* {childrenShowing && props.tree && props.tree.length > 0 && */
               props.tree.map(child => (
                 <li key={child.id} className="flex flex-li">
-                  <Link to={`${props.route}/${child.id}`.toString()}>{child.value}</Link>
-                  {child.childrenShowing &&
-                  <Switch>
-                    <Route path={`${props.route}/:id`}>
-                      <Tree tree={props.tree} value={`${props.route}/${child.id}`} />
-                    </Route>
-                  </Switch>
-                  }
+                  <button className="btn-li" onClick={() => toggleChildren(!childrenShowing)} >{child.value}</button>
+                  {/* {child.childrenShowing &&
+                    <Tree tree={props.tree} value={`${props.route}/${child.id}`} />
+                  } */}
                 </li>
               ))
             }
-            <li className="flex flex-li">
-              <button onClick={() => toggleChildren(!childrenShowing)} >{childrenShowing ? "-" : "+"}</button>
-              <form onBlur={props.addNode} onSubmit={props.addNode}>
-                <input type="text" name="nodeValue" placeholder={props.route || "Enter new item..."} />
-              </form>
-            </li>
           </ul>
+          <form onBlur={props.addNode} onSubmit={props.addNode}>
+            <input type="text" name="nodeValue" placeholder={props.route || "Enter new item..."} />
+          </form>
         </div>
       </section>
     </div>
