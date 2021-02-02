@@ -1,71 +1,112 @@
 import React from 'react'
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
+
+import { TreeProvider, TreeConsumer } from './contexts/TreeContext'
+import Tree from './components/Tree'
 import './App.css'
 
-class Node {
-  constructor(value) {
-    this.childNodes = []
-    this.value = value
-  }
-}
+// function Person() {
+//   let { url } = useRouteMatch();
+//   let { id } = useParams();
+//   let person = find(parseInt(id));
 
-class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = new Node("root")
-  }
+//   return (
+//     <div>
+//       <h3>{person.name}’s Friends</h3>
 
-  addNode(event) {
-    event.preventDefault()
-    if (event.target[0] === undefined) {
-      // onBlur event fired
-      if (event.target.value.trim() === "") return event.target.value = ""
-      const newNode = new Node(event.target.value.trim())
-      this.setState(prevState => ({
-        childNodes : [
-          ...prevState.childNodes, 
-          newNode 
-        ]
-      }))
-      event.target.value = ""
-    } else { 
-      // the form was submitted, the 0th element is the nodeValue named input
-      if (event.target[0].value.trim() === "") return event.target[0].value = ""
-      const newNode = new Node(event.target[0].value.trim())
-      this.setState(prevState => ({
-        childNodes : [
-          ...prevState.childNodes, 
-          newNode 
-        ]
-      }))
-      event.target[0].value = ""
+//       <ul>
+//         {person.friends.map(id => (
+//           <li key={id}>
+//             <Link to={`${url}/${id}`}>{find(id).name}</Link>
+//           </li>
+//         ))}
+//       </ul>
+
+//       <Switch>
+//         <Route path={`${url}/:id`}>
+//           <Person />
+//         </Route>
+//       </Switch>
+//     </div>
+//   );
+// }
+
+// const PEEPS = [
+//   { id: 0, name: "Michelle", friends: [1, 2, 3] },
+//   { id: 1, name: "Sean", friends: [0, 3] },
+//   { id: 2, name: "Kim", friends: [0, 1, 3] },
+//   { id: 3, name: "David", friends: [1, 2] }
+// ];
+
+// function find(id) {
+//   return PEEPS.find(p => p.id === id);
+// }
+
+function App() {
+  class TreeNode {
+    constructor(value) {
+      console.log('new treenode value: '+ value)
+      this.childNodes = []
+      this.value = value
+      this.id = newId()
     }
   }
 
-  render() {
-    return (
-      <div className="App">
-        <section>
-          <div>
-            <ul>
-              {
-                this.state.childNodes.length > 0 && 
-                this.state.childNodes.map(child => <li key={child.value}>{child.value} - {child.childNodes.toString()}</li>)
-              }
-              <li>
-                <form onBlur={e => this.addNode(e)} onSubmit={e => this.addNode(e)} >
-                  <input type="text" name="nodeValue" placeholder="Enter new item..." />
-                </form>
-              </li>
-            </ul>
-          </div>
-        </section>
+  let idCounter = 1
+  function newId() {
+    return ++idCounter 
+  }
 
+  let tree = []
+
+  const add = value => tree.push(new TreeNode(value))
+  
+  const remove = id => {
+    const newTree = tree.map(_id => {
+      return _id !== id
+    })
+    tree = newTree
+  }
+  
+  const edit = (id, value) => {
+    const newTree = tree.map(_id => _id === id ? _id.value = value : _id) // TODO fix this I'm tired
+    tree = newTree
+  }
+
+  const context = { 
+    tree: tree,
+    add: add,
+    edit: edit,
+    remove: remove
+  }
+
+  return (
+    <TreeProvider value={context}>
+      <div className="App">
         <header className="App-header">
           <h1>Nodepad</h1>        
         </header>
+
+        <section>
+          <Router>
+            <TreeConsumer>
+            {({ tree, add, edit, remove }) => 
+              <Switch>
+                <Route path="/:id">
+                  <Tree tree={tree} add={add} edit={edit} remove={remove} />
+                </Route>
+                <Route>
+                  <Redirect to="/0" />
+                </Route>
+              </Switch>
+              }
+            </TreeConsumer>
+          </Router>
+        </section>
+
       </div>
-    )
-  }
+    </TreeProvider>
+  )
 }
 
 export default App

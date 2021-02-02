@@ -3,10 +3,18 @@
     animation: App-logo-spin infinite 20s linear;
   }
 } */
+html {
+  box-sizing: border-box;
+  font-size: 10px;
+}
+
+body {
+  font-size: 2rem;
+  background-color: #282c34;
+  min-height: calc(100vh - 3rem);
+}
 
 .App {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,6 +33,8 @@
 
 ul, ol, li {
   list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
 input {
@@ -35,6 +45,16 @@ input {
   color: whitesmoke;
   font-weight: 500;
   border: 1px dashed whitesmoke;
+}
+
+a {
+  text-decoration: none;
+  color: initial;
+  color: lightgray;
+}
+
+.flex {
+  display: flex;
 }
 
 /* @keyframes App-logo-spin {
