@@ -15,12 +15,13 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start BROWSER=none",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "styleguide": "styleguidist server",
-    "styleguide:build": "styleguidist build"
+    "styleguide:build": "styleguidist build",
+    "mac_todos": "grep -nR --include='*.js' --exclude-dir='node_modules' --color=auto 'TODO' src"
   },
   "eslintConfig": {
     "extends": [

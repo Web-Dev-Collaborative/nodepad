@@ -1,87 +1,59 @@
 import React from 'react'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 
-import { TreeProvider, TreeConsumer } from './contexts/TreeContext'
 import Tree from './components/Tree'
 import './App.css'
 
-// function Person() {
-//   let { url } = useRouteMatch();
-//   let { id } = useParams();
-//   let person = find(parseInt(id));
+class TreeNode {
+  constructor(id, value) {
+    // console.log('new treenode id['+id+']. val['+ value+']')
+    this.childNodes = []
+    this.value = value
+    this.id = id
+  }
+} 
 
-//   return (
-//     <div>
-//       <h3>{person.name}’s Friends</h3>
+class App extends React.Component {
+  state = {
+    tree: [],
+    idCounter: 1
+  }
 
-//       <ul>
-//         {person.friends.map(id => (
-//           <li key={id}>
-//             <Link to={`${url}/${id}`}>{find(id).name}</Link>
-//           </li>
-//         ))}
-//       </ul>
+  remove(id) {
+    const newTree = this.tree.map(_id => {
+      return _id !== id
+    })
+    this.setState({tree: newTree})
+  }
+  
+  edit(id, value) {
+    const newTree = this.tree.map(_id => _id === id ? _id.value = value : _id) // TODO fix this I'm tired
+    this.setState({tree: newTree})
+  }
 
-//       <Switch>
-//         <Route path={`${url}/:id`}>
-//           <Person />
-//         </Route>
-//       </Switch>
-//     </div>
-//   );
-// }
-
-// const PEEPS = [
-//   { id: 0, name: "Michelle", friends: [1, 2, 3] },
-//   { id: 1, name: "Sean", friends: [0, 3] },
-//   { id: 2, name: "Kim", friends: [0, 1, 3] },
-//   { id: 3, name: "David", friends: [1, 2] }
-// ];
-
-// function find(id) {
-//   return PEEPS.find(p => p.id === id);
-// }
-
-function App() {
-  class TreeNode {
-    constructor(value) {
-      console.log('new treenode value: '+ value)
-      this.childNodes = []
-      this.value = value
-      this.id = newId()
+  addNode(event) {    
+    event.preventDefault()
+    if (event.target[0] === undefined) { // onBlur event fired
+      if (event.target.value.trim() === "") return event.target.value = ""
+      const newTree = new TreeNode(this.state.idCounter, event.target.value.trim())
+      this.setState(prevState => ({
+        tree: [...prevState.tree, newTree],
+        idCounter: prevState.idCounter + 1
+      }))
+      event.target.value = ""
+    } else { // the form was submitted, the 0th element is the nodeValue named input
+      if (event.target[0].value.trim() === "") return event.target[0].value = ""
+      const newTree = new TreeNode(this.state.idCounter, event.target[0].value.trim())
+      this.setState(prevState => ({
+        tree: [...prevState.tree, newTree],
+        idCounter: prevState.idCounter + 1
+      }))
+      event.target[0].value = ""
     }
   }
 
-  let idCounter = 1
-  function newId() {
-    return ++idCounter 
-  }
-
-  let tree = []
-
-  const add = value => tree.push(new TreeNode(value))
-  
-  const remove = id => {
-    const newTree = tree.map(_id => {
-      return _id !== id
-    })
-    tree = newTree
-  }
-  
-  const edit = (id, value) => {
-    const newTree = tree.map(_id => _id === id ? _id.value = value : _id) // TODO fix this I'm tired
-    tree = newTree
-  }
-
-  const context = { 
-    tree: tree,
-    add: add,
-    edit: edit,
-    remove: remove
-  }
-
-  return (
-    <TreeProvider value={context}>
+  render() {
+    return (
       <div className="App">
         <header className="App-header">
           <h1>Nodepad</h1>        
@@ -89,24 +61,28 @@ function App() {
 
         <section>
           <Router>
-            <TreeConsumer>
-            {({ tree, add, edit, remove }) => 
-              <Switch>
-                <Route path="/:id">
-                  <Tree tree={tree} add={add} edit={edit} remove={remove} />
-                </Route>
-                <Route>
-                  <Redirect to="/0" />
-                </Route>
-              </Switch>
-              }
-            </TreeConsumer>
+            <Switch>
+              <Route path="/:id">
+                {({ history }) => 
+                  <Tree 
+                    route={history.location.pathname} 
+                    tree={this.state.tree} 
+                    edit={this.edit} 
+                    remove={this.remove} 
+                    addNode={e => this.addNode(e)}
+                  /> 
+                }
+              </Route>
+              <Route>
+                <Redirect to="/0" />
+              </Route>
+            </Switch>
           </Router>
         </section>
 
       </div>
-    </TreeProvider>
-  )
+    )
+  }
 }
 
 export default App

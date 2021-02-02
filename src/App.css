@@ -57,6 +57,19 @@ a {
   display: flex;
 }
 
+.show_me {
+  height: 20px;
+  border: 2px solid red;
+  color: white;
+  background: darkslategrey;
+  text-align: center;
+  width: 400px;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  padding: 10px;
+}
+
 /* @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
