@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import { Link, Route, Redirect, Switch } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 /*
 * Tree class
 */
 function Tree(props) { 
-  console.dir(props)
+  console.dir(props.tree)
   console.log(props.route + " component")
   const [childrenShowing, toggleChildren] = useState(true)
 
@@ -18,7 +18,15 @@ function Tree(props) {
             {/* {childrenShowing && props.tree && props.tree.length > 0 && */
               props.tree.map(child => (
                 <li key={child.id} className="flex flex-li">
-                  <button className="btn-li" onClick={() => toggleChildren(!childrenShowing)} >{child.value}</button>
+                  <input
+                    type="text"
+                    className="btn-li"
+                    onChange={e => props.edit(e.target.value)} 
+                    onBlur={() => props.update(child.id)}
+                    placeholder={props.valsById[child.id]}
+                    onFocus={e => props.getValue(e)}
+                  />
+                  <button className="btn-li" onClick={() => toggleChildren(!childrenShowing)} >{childrenShowing ? "-" : "+"}</button>
                   {/* {child.childrenShowing &&
                     <Tree tree={props.tree} value={`${props.route}/${child.id}`} />
                   } */}
@@ -41,7 +49,8 @@ Tree.propTypes = {
   edit: PropTypes.func.isRequired, 
   value: PropTypes.string,
   tree: PropTypes.array.isRequired,
-  route: PropTypes.string.isRequired
+  route: PropTypes.string.isRequired,
+  valsById: PropTypes.array
 }
 
 export default Tree

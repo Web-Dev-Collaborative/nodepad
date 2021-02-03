@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 
 import Tree from './components/Tree'
+import Welcome from './components/Welcome'
 import './App.css'
 
 class TreeNode {
@@ -10,46 +11,74 @@ class TreeNode {
     this.childNodes = []
     this.value = value
     this.id = id
+
   }
 } 
 
 class App extends React.Component {
-  state = {
-    tree: [],
-    idCounter: 1
+  constructor() {
+    super()
+    this.state = {
+      tree: [],
+      idCounter: 0,
+      currentVal: "",
+      valsById: []
+    }
   }
 
   remove(id) {
-    const newTree = this.tree.map(_id => {
+    const newTree = this.state.tree.map(_id => {
       return _id !== id
     })
-    this.setState({tree: newTree})
+    const newValsById = [...this.state.valsById]
+    newValsById[id] = null
+    this.setState(prevState => ({
+      ...prevState, 
+      tree: newTree, 
+      valsById: newValsById
+    }))
   }
   
-  edit(id, value) {
-    const newTree = this.tree.map(_id => _id === id ? _id.value = value : _id) // TODO fix this I'm tired
-    this.setState({tree: newTree})
+  edit(value) {
+    this.setState({currentVal: value })
+  }
+
+  update(id) {
+    const newTree = this.state.tree.map(_id => _id.id === id ? {id: _id.id, childNodes: [..._id.childNodes], value: this.state.currentVal} : _id) 
+    const newValsById = [...this.state.valsById]
+    newValsById[id] = this.state.currentVal
+    this.setState(prevState => ({ ...prevState, tree: newTree, valsById: newValsById, currentVal: null }))
   }
 
   addNode(event) {    
     event.preventDefault()
     if (event.target[0] === undefined) { // onBlur event fired
-      if (event.target.value.trim() === "") return event.target.value = ""
-      const newTree = new TreeNode(this.state.idCounter, event.target.value.trim())
+      const val = event.target.value.trim()
+      if (val === "") return event.target.value = ""
+      const newTree = new TreeNode(this.state.idCounter, val)
       this.setState(prevState => ({
         tree: [...prevState.tree, newTree],
-        idCounter: prevState.idCounter + 1
+        idCounter: prevState.idCounter + 1,
+        valsById: [...prevState.valsById, val]
       }))
       event.target.value = ""
     } else { // the form was submitted, the 0th element is the nodeValue named input
-      if (event.target[0].value.trim() === "") return event.target[0].value = ""
-      const newTree = new TreeNode(this.state.idCounter, event.target[0].value.trim())
+      const val = event.target[0].value.trim()
+      if (val === "") return event.target[0].value = ""
+      const newTree = new TreeNode(this.state.idCounter, val)
       this.setState(prevState => ({
         tree: [...prevState.tree, newTree],
-        idCounter: prevState.idCounter + 1
+        idCounter: prevState.idCounter + 1,
+        valsById: [...prevState.valsById, val]
       }))
       event.target[0].value = ""
     }
+  }
+
+  getValue(e) {
+    console.log('GET VALUE')
+    console.log(e.target.placeholder,e.target.value)
+    return e.target.value = e.target.placeholder || e.target.value
   }
 
   render() {
@@ -62,19 +91,22 @@ class App extends React.Component {
         <section>
           <Router>
             <Switch>
+              <Route path="/welcome">
+                <Welcome createRoot={this.addNode.bind(this)} />
+              </Route>
               <Route path="/:id">
                 {({ history }) => 
                   <Tree 
                     route={history.location.pathname} 
                     tree={this.state.tree} 
-                    edit={this.edit} 
-                    remove={this.remove} 
-                    addNode={e => this.addNode(e)}
+                    edit={this.edit.bind(this)} 
+                    remove={this.remove.bind(this)} 
+                    addNode={this.addNode.bind(this)}
+                    update={this.update.bind(this)}
+                    valsById={this.state.valsById}
+                    getValue={this.getValue}
                   /> 
                 }
-              </Route>
-              <Route>
-                <Redirect to="/0" />
               </Route>
             </Switch>
           </Router>
