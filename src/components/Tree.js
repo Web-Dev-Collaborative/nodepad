@@ -1,40 +1,40 @@
-import React, { useState } from 'react'
-import { Link, Route, Redirect, Switch } from 'react-router-dom'
+import React from 'react'
+// import { Link, Route, Redirect, Switch } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 /*
 * Tree class
 */
 function Tree(props) { 
-  console.dir(props.tree)
-  console.log(props.route + " component")
-  const [childrenShowing, toggleChildren] = useState(true)
-
-  // no root, redirect to welcome page to start a new tree with unchangeable root
-  if (!props || !props.tree || props.tree.length < 1) return <Redirect to="/welcome" />
+  console.log(props.history + " component")
+  // TODO find base of current Tree using path
+  let currentTree = "/0" //placeholder testing TODO remove
+  let currentRoot = 0
+  
+  // no props and/or tree, redirect to welcome page to start a new tree root
+  if (!props || !props.nodeValues || !props.nodeChildren || !props.childrenShowing ) return props.history.push("/welcome")
 
   return (
-    <div key={(props.tree[0] && props.tree[0].id) || "0"} className="Tree">
+    <div key={currentRoot} className="Tree">
       <section className="main">
         <ul>
-          <li className="btn-li">{props.valsById[0]}</li> 
+          <li className="btn-li">{props.nodeValues[currentRoot]}</li> 
           {/* {childrenShowing && */
-            props.tree && 
-            props.tree.length > 0 && 
-            props.tree.map(node => (
-              node.id !== 0 && // do NOT render the root as edit-able
+            props.nodeChildren[currentRoot] &&
+            props.nodeChildren[currentRoot].length > 0 && 
+            props.nodeChildren[currentRoot].map(childIndex => (
               <li 
-                key={node.id} 
+                key={childIndex} 
                 className="flex flex-li"
               >
-                <button className="btn-li" onClick={() => toggleChildren(!childrenShowing)} >{childrenShowing ? "-" : "+"}</button>
-                <button className="btn-li" onClick={() => props.reBase(node.id)} >&#9660;</button>
+                <button className="btn-li" onClick={() => alert("Ok buddeh")} >{props.childrenShowing[childIndex] ? "-" : "+"}</button>
+                <button className="btn-li" onClick={() => props.reBase(childIndex)} >&#9660;</button>
                 <input
                   type="text"
                   className="btn-li"
                   onChange={e => props.edit(e.target.value)} 
-                  onBlur={() => props.update(node.id)}
-                  placeholder={props.valsById[node.id]}
+                  onBlur={() => props.update(childIndex)}
+                  placeholder={props.valsById[childIndex]}
                   onFocus={e => props.getValue(e)}
                 />
               </li>
@@ -54,10 +54,11 @@ Tree.propTypes = {
   remove: PropTypes.func.isRequired,
   edit: PropTypes.func.isRequired, 
   value: PropTypes.string,
-  tree: PropTypes.array.isRequired,
-  route: PropTypes.string.isRequired,
-  valsById: PropTypes.array,
-  rebase: PropTypes.func.isRequired
+  history: PropTypes.object.isRequired,
+  rebase: PropTypes.func.isRequired,
+  nodeChildren: PropTypes.array.isRequired,
+  nodeValues: PropTypes.array.isRequired,
+  childrenShowing: PropTypes.array.isRequired
 }
 
 export default Tree
