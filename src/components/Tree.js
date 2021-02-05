@@ -17,28 +17,32 @@ function Tree(props) {
     <div key={(props.tree[0] && props.tree[0].id) || "0"} className="Tree">
       <section className="main">
         <ul>
-          {/* {childrenShowing && props.tree && props.tree.length > 0 && */
-            props.tree.map(child => (
-              <li key={child.id} className="flex flex-li">
+          <li className="btn-li">{props.valsById[0]}</li> 
+          {/* {childrenShowing && */
+            props.tree && 
+            props.tree.length > 0 && 
+            props.tree.map(node => (
+              node.id !== 0 && // do NOT render the root as edit-able
+              <li 
+                key={node.id} 
+                className="flex flex-li"
+              >
                 <button className="btn-li" onClick={() => toggleChildren(!childrenShowing)} >{childrenShowing ? "-" : "+"}</button>
-                <button className="btn-li" onClick={() => props.reBase(child.id)} >&#9660;</button>
+                <button className="btn-li" onClick={() => props.reBase(node.id)} >&#9660;</button>
                 <input
                   type="text"
                   className="btn-li"
                   onChange={e => props.edit(e.target.value)} 
-                  onBlur={() => props.update(child.id)}
-                  placeholder={props.valsById[child.id]}
+                  onBlur={() => props.update(node.id)}
+                  placeholder={props.valsById[node.id]}
                   onFocus={e => props.getValue(e)}
                 />
-                {/* {child.childrenShowing &&
-                  <Tree tree={props.tree} value={`${props.route}/${child.id}`} />
-                } */}
               </li>
             ))
           }
         </ul>
         <form onBlur={props.addNode} onSubmit={props.addNode}>
-          <input type="text" name="nodeValue" placeholder={props.route || "Enter new item..."} />
+          <input type="text" name="nodeValue" className="btn-li" placeholder="Enter new item..." />
         </form>
       </section>
     </div>

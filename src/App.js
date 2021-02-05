@@ -92,7 +92,7 @@ class App extends React.Component {
 
     const newTree = new TreeNode(this.state.idCounter, val)
     this.setState(prevState => ({
-      tree: newTree,
+      tree: [newTree],
       idCounter: prevState.idCounter + 1,
       valsById: [...prevState.valsById, val]
     }))
