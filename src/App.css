@@ -10,8 +10,6 @@ html {
 
 body {
   font-size: 2rem;
-  background-color: darkslategray;
-  min-height: calc(100vh - 3rem);
 }
 
 .App {
@@ -20,6 +18,9 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
+  background-color: darkslategray;
+  width: 100vw;
+  min-height: 100vh;
 }
 
 .App-header {
@@ -58,7 +59,9 @@ body {
 }
 
 .main {
-  margin-top: 75px;
+  width: 100vw;
+  max-width: 90vw;
+  margin: 75px auto 0;
 }
 
 ul, ol {
@@ -71,7 +74,6 @@ li {
   padding: 0;
   margin-top: 5px;
   list-style-type: none;
-  border-bottom: 2px dotted lightslategray;
 }
 
 input {
@@ -105,7 +107,7 @@ a {
   border: none;
   width: 100%;
   height: 100%;
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.04);
   color: white;
   font-weight: 600;
   text-transform: uppercase;
@@ -116,6 +118,15 @@ a {
 
 .btn-li:hover {
   cursor: pointer;
+}
+
+button.btn-li {
+  max-width: 40px;
+  margin-right: 5px;
+}
+
+input.btn-li {
+  text-overflow: clip;
 }
 
 .show_me {

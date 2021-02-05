@@ -11,7 +11,6 @@ class TreeNode {
     this.childNodes = []
     this.value = value
     this.id = id
-
   }
 } 
 
@@ -76,9 +75,29 @@ class App extends React.Component {
   }
 
   getValue(e) {
-    console.log('GET VALUE')
-    console.log(e.target.placeholder,e.target.value)
+    console.log('[GET VALUE] placeholder: '+e.target.placeholder+". val: "+e.target.value)
     return e.target.value = e.target.placeholder || e.target.value
+  }
+
+  rebase(id) {
+    console.log("[REBASING] id: "+id)
+    return true
+  }
+
+  createRoot(event, history) {
+    event.preventDefault()
+    if (!event.target || !event.target[0]) return new Error("Unable to create root node. Try again later.")    
+    const val = event.target[0].value
+    console.log("[CREATE ROOT] val[0]: "+val)
+
+    const newTree = new TreeNode(this.state.idCounter, val)
+    this.setState(prevState => ({
+      tree: newTree,
+      idCounter: prevState.idCounter + 1,
+      valsById: [...prevState.valsById, val]
+    }))
+    event.target[0].value = ""
+    return history.push(`/${val}`)
   }
 
   render() {
@@ -92,7 +111,13 @@ class App extends React.Component {
           <Router>
             <Switch>
               <Route path="/welcome">
-                <Welcome createRoot={this.addNode.bind(this)} />
+              {({ history }) => 
+                <Welcome 
+                  history={history}
+                  createRoot={this.createRoot.bind(this)} 
+                  edit={this.edit.bind(this)} 
+                />
+              }
               </Route>
               <Route path="/:id">
                 {({ history }) => 
@@ -105,8 +130,12 @@ class App extends React.Component {
                     update={this.update.bind(this)}
                     valsById={this.state.valsById}
                     getValue={this.getValue}
+                    rebase={this.rebase.bind(this)}
                   /> 
                 }
+              </Route>
+              <Route>
+                <Redirect to="/welcome" />
               </Route>
             </Switch>
           </Router>
