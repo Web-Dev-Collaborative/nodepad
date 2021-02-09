@@ -13,7 +13,8 @@ class App extends React.Component {
       nodeChildren: [],
       nodeValues: [],
       childrenShowing: [],
-      currentVal: ""
+      currentVal: "",
+      currentIdx: 0
     }
   }
 
@@ -43,6 +44,7 @@ class App extends React.Component {
 
   addNode(event) {    
     event.preventDefault()
+
     let val
     if (event.target[0] === undefined) { // onBlur event fired
       val = event.target.value.trim()
@@ -51,8 +53,12 @@ class App extends React.Component {
       val = event.target[0].value.trim()
       if (val === "") return event.target[0].value = ""
     }
+    const newChildren = [...this.state.nodeChildren[this.state.currentIdx], val]
+    const updatedNodeChildren = [...this.state.nodeChildren]
+    updatedNodeChildren[this.state.currentIdx] = newChildren
+
     this.setState(prevState => ({
-      nodeChildren: [...prevState.nodeChildren, []], // at the next index, append an empty array to hold any children of this new node
+      nodeChildren: updatedNodeChildren, 
       nodeValues: [...prevState.nodeValues, val], 
       idCounter: prevState.idCounter + 1,
       childrenShowing: [...prevState.childrenShowing, false] // default to not showing any children
@@ -65,8 +71,8 @@ class App extends React.Component {
     return e.target.value = e.target.placeholder || e.target.value
   }
 
-  rebase(id) {
-    console.log("[REBASING] id: "+id)
+  rebase(id, val) {
+    console.log("[REBASING] id: "+id+". val: "+val)
     return true
   }
 
@@ -111,6 +117,7 @@ class App extends React.Component {
                     history={history} 
                     nodeChildren={this.state.nodeChildren}
                     nodeValues={this.state.nodeValues}
+                    currentIdx={this.state.currentIdx}
                     childrenShowing={this.state.childrenShowing}
                     edit={this.edit.bind(this)} 
                     remove={this.remove.bind(this)} 
