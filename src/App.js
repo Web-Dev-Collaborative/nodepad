@@ -32,14 +32,19 @@ class App extends React.Component {
   }
   
   edit(value) {
+    console.log('EDIT func. val: '+value)
     this.setState({currentVal: value })
   }
 
-  update(id) {
-    const newTree = this.state.nodeValues.map(node => node.id === id ? {id: node.id, childNodes: [...node.childNodes], value: this.state.currentVal} : node) 
+  update(nodeValsChildIndex) {
+    console.log("UPDATE. child index ", nodeValsChildIndex)
+    console.log(`UPDATE. new value ${this.state.currentVal}`)
+
     const newnodeValues = [...this.state.nodeValues]
-    newnodeValues[id] = this.state.currentVal
-    this.setState(prevState => ({ ...prevState, tree: newTree, nodeValues: newnodeValues, currentVal: null }))
+    newnodeValues[nodeValsChildIndex] = this.state.currentVal
+    console.log('NEW node vals: ', newnodeValues)
+
+    this.setState(prevState => ({ ...prevState, nodeValues: newnodeValues, currentVal: null }))
   }
 
   addNode(event) {    
@@ -53,7 +58,12 @@ class App extends React.Component {
       val = event.target[0].value.trim()
       if (val === "") return event.target[0].value = ""
     }
-    const newChildren = [...this.state.nodeChildren[this.state.currentIdx], val]
+
+    // nodeChildren is an array, 
+    // index corresponds to the index of the value stored in nodeValues array
+    // nodeChildren[index] is an array containing pointers/indices of children/descendeants of this node in the nodeValues array
+    // each time we add a descendent, append a new reference to the nodeValues index storing the new descendant's value
+    const newChildren = [...this.state.nodeChildren[this.state.currentIdx], this.state.nodeValues.length] 
     const updatedNodeChildren = [...this.state.nodeChildren]
     updatedNodeChildren[this.state.currentIdx] = newChildren
 
@@ -66,9 +76,11 @@ class App extends React.Component {
     event.target[0] === undefined ? event.target.value = "" : event.target[0].value = ""
   }
 
-  getValue(e) {
+  setValue(e) {
     console.log('[GET VALUE] placeholder: '+e.target.placeholder+". val: "+e.target.value)
-    return e.target.value = e.target.placeholder || e.target.value
+    const val = e.target.placeholder || e.target.value
+    e.target.value = val
+    this.setState(prevState => ({...prevState, currentVal: val}))
   }
 
   rebase(id, val) {
@@ -80,13 +92,14 @@ class App extends React.Component {
     event.preventDefault()
     if (!event.target || !event.target[0]) return new Error("Unable to create root node. Try again later.")    
     const val = event.target[0].value
-    console.log("[CREATE ROOT] val[0]: "+val)
+    console.log("[CREATE ROOT] val: "+val)
 
     this.setState(prevState => ({
-      nodeChildren: [...prevState.nodeChildren, []],
+      nodeChildren: [[]],
       nodeValues: [val],
-      idCounter: prevState.idCounter,
-      childrenShowing: [...prevState.childrenShowing, true]
+      idCounter: 0,
+      childrenShowing: [true],
+      currentVal: ""
     }))
     event.target[0].value = ""
     return history.push(`/${val}`)
@@ -123,7 +136,7 @@ class App extends React.Component {
                     remove={this.remove.bind(this)} 
                     addNode={this.addNode.bind(this)}
                     update={this.update.bind(this)}
-                    getValue={this.getValue}
+                    setValue={this.setValue.bind(this)}
                     rebase={this.rebase.bind(this)}
                   /> 
                 }

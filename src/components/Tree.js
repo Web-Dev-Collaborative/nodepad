@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 * Tree class
 */
 function Tree(props) { 
-  console.log('TREE')
+  console.log('TREE updated...')
   // console.log(props.history) 
   // no props and/or tree, redirect to welcome page to start a new tree root
   if (!props || !props.nodeValues || props.nodeValues.length < 1 || !props.nodeChildren || !props.childrenShowing ) return <Redirect to="/welcome" />
@@ -17,25 +17,27 @@ function Tree(props) {
         <ul>
           <li className="btn-li">{props.nodeValues[props.currentIdx]}</li> 
           {/* {childrenShowing && */
+            props.nodeChildren &&
+            props.nodeChildren.length > 0 && 
             props.nodeChildren[props.currentIdx] &&
-            props.nodeChildren[props.currentIdx].length > 0 && 
-            props.nodeChildren[props.currentIdx].map((val, idx) => (
-              <li 
-                key={`${idx}${val}`} 
-                data-columns={`${idx}${val}`} 
-                className="flex flex-li"
-              >
-                <button className="btn-li" onClick={() => alert("Ok buddeh")} >{props.childrenShowing[idx] ? "-" : "+"}</button>
-                <button className="btn-li" onClick={() => props.rebase(idx, val)} >&#9660;</button>
-                <input
-                  type="text"
-                  className="btn-li"
-                  onChange={e => props.edit(e.target.value)} 
-                  onBlur={() => props.update((idx, val))}
-                  value={props.nodeChildren[props.currentIdx][idx]}
-                  onFocus={e => props.getValue(e)}
-                />
-              </li>
+            props.nodeChildren[props.currentIdx].length > 0 &&
+            props.nodeChildren[props.currentIdx].map((location, idx) => (
+            <li 
+              key={`${idx}${props.nodeValues[location]}`} 
+              data-columns={`${idx}-${props.nodeValues[location]}`} 
+              className="flex flex-li"
+            >
+              <button className="btn-li" onClick={() => alert("Ok buddeh")} >{props.childrenShowing[idx] ? "-" : "+"}</button>
+              <button className="btn-li" onClick={() => props.rebase(props.currentIdx, idx, props.nodeValues[props.currentIdx][idx])} >&#9660;</button>
+              <input
+                type="text"
+                className="btn-li"
+                placeholder={props.nodeValues[location]}
+                onChange={e => props.edit(e.target.value)} 
+                onBlur={() => props.update(location)}
+                onFocus={e => props.setValue(e)}
+              />
+            </li> 
             ))
           }
         </ul>
@@ -51,6 +53,7 @@ Tree.propTypes = {
   addNode: PropTypes.func.isRequired,
   remove: PropTypes.func.isRequired,
   edit: PropTypes.func.isRequired, 
+  setValue: PropTypes.func.isRequired,
   value: PropTypes.string,
   currentIdx: PropTypes.number,
   history: PropTypes.object.isRequired,
