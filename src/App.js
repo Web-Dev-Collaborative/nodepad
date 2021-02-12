@@ -47,25 +47,19 @@ class App extends React.Component {
     this.setState(prevState => ({ ...prevState, nodeValues: newnodeValues, currentVal: null }))
   }
 
-  addNode(event) {    
-    event.preventDefault()
+  addNode(val, nodeIndex, event) {    
+    if (event) event.preventDefault() // form submitted, stop page reload
+    if ((val === "" || val === undefined || val === null) && event) return event.target.value = ""
 
-    let val
-    if (event.target[0] === undefined) { // onBlur event fired
-      val = event.target.value.trim()
-      if (val === "") return event.target.value = ""
-    } else { // the form was submitted, the 0th element is the nodeValue named input
-      val = event.target[0].value.trim()
-      if (val === "") return event.target[0].value = ""
-    }
-
+    console.log('ADD NODE. ', nodeIndex, val)
     // nodeChildren is an array, 
     // index corresponds to the index of the value stored in nodeValues array
     // nodeChildren[index] is an array containing pointers/indices of children/descendeants of this node in the nodeValues array
     // each time we add a descendent, append a new reference to the nodeValues index storing the new descendant's value
-    const newChildren = [...this.state.nodeChildren[this.state.currentIdx], this.state.nodeValues.length] 
+    const newChildren = this.state.nodeChildren[nodeIndex] ? [...this.state.nodeChildren[nodeIndex], this.state.nodeValues.length] : [this.state.nodeValues.length]
+    console.log('NEW CHILDREN at nodeIndex ', nodeIndex, newChildren)
     const updatedNodeChildren = [...this.state.nodeChildren]
-    updatedNodeChildren[this.state.currentIdx] = newChildren
+    updatedNodeChildren[nodeIndex] = newChildren
 
     this.setState(prevState => ({
       nodeChildren: updatedNodeChildren, 
@@ -73,7 +67,7 @@ class App extends React.Component {
       idCounter: prevState.idCounter + 1,
       childrenShowing: [...prevState.childrenShowing, false] // default to not showing any children
     }))
-    event.target[0] === undefined ? event.target.value = "" : event.target[0].value = ""
+    if (event) event.target[0] === undefined ? event.target.value = "" : event.target[0].value = ""
   }
 
   setValue(e) {
@@ -94,15 +88,22 @@ class App extends React.Component {
     const val = event.target[0].value
     console.log("[CREATE ROOT] val: "+val)
 
-    this.setState(prevState => ({
+    this.setState({
       nodeChildren: [[]],
       nodeValues: [val],
       idCounter: 0,
       childrenShowing: [true],
       currentVal: ""
-    }))
+    })
     event.target[0].value = ""
     return history.push(`/${val}`)
+  }
+
+  toggleShowingChildAt(idx) {
+    console.log('SHOW CHILD ',idx)
+    const newChildrenShowing = [...this.state.childrenShowing]
+    newChildrenShowing[idx] = !this.state.childrenShowing[idx]
+    this.setState({ childrenShowing: newChildrenShowing })
   }
 
   render() {
@@ -138,6 +139,7 @@ class App extends React.Component {
                     update={this.update.bind(this)}
                     setValue={this.setValue.bind(this)}
                     rebase={this.rebase.bind(this)}
+                    toggleShowingChildAt={this.toggleShowingChildAt.bind(this)}
                   /> 
                 }
               </Route>
