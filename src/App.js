@@ -49,8 +49,9 @@ class App extends React.Component {
 
   addNode(val, nodeIndex, event) {    
     if (event) event.preventDefault() // form submitted, stop page reload
-    if ((val === "" || val === undefined || val === null) && event) return event.target.value = ""
-
+    if ((val === "" || val === undefined) && event) return event.target.value = ""
+    if (val === null) val = this.state.nodeValues.length // new chlid node button pushed without value
+ 
     console.log('ADD NODE. ', nodeIndex, val)
     // nodeChildren is an array, 
     // index corresponds to the index of the value stored in nodeValues array
@@ -65,7 +66,7 @@ class App extends React.Component {
       nodeChildren: updatedNodeChildren, 
       nodeValues: [...prevState.nodeValues, val], 
       idCounter: prevState.idCounter + 1,
-      childrenShowing: [...prevState.childrenShowing, false] // default to not showing any children
+      childrenShowing: [...prevState.childrenShowing, true] // default to showing any children
     }))
     if (event) event.target[0] === undefined ? event.target.value = "" : event.target[0].value = ""
   }

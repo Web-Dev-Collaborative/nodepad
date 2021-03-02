@@ -6,42 +6,48 @@ import PropTypes from 'prop-types'
 * Tree class
 */
 function Tree(props) { 
-  console.log('TREE updated...')
-  // console.log(props.history) 
   // no props and/or tree, redirect to welcome page to start a new tree root
   if (!props || !props.nodeValues || props.nodeValues.length < 1 || !props.nodeChildren || !props.childrenShowing ) return <Redirect to="/welcome" />
 
   return (
-    <div key={`${props.currentIdx}${props.nodeChildren[props.currentIdx]}`} className="Tree">
+    <div className="Tree">
       <section className="main">
         <ul>
-          <li className="btn-li">{props.nodeValues[props.currentIdx]}</li>
+          { props.childrenShowing.map((showChildren, nodeIndex) => (
+              props.nodeValues[nodeIndex] === undefined ? null : (
+                <ul key={nodeIndex}>
 
-          { props.nodeChildren && props.nodeChildren.length > 0 && 
-            props.nodeChildren.map((childIdx, idx) => (
-              <div key={childIdx} >
-              { props.childrenShowing[idx] ? null : childIdx.length }
-              { props.nodeChildren[idx] && props.nodeChildren[idx].length > 0 && props.childrenShowing[idx] &&
-                props.nodeChildren[idx].map((location, idx) => (
-                  <li 
-                    key={`${idx}${props.nodeValues[location]}`} 
-                    data-columns={`${idx}-${props.nodeValues[location]}`} 
-                    className="flex flex-li"
-                  >
-                    <button className={props.childrenShowing[idx] ? "btn-li btn-li-active" : "btn-li"} onClick={() => props.toggleShowingChildAt(location)} >&#9660;</button>
-                    <button className="btn-li" onClick={() => props.addNode("New Node...", location)} >+</button>
-                    <input
-                      type="text"
-                      className="btn-li"
-                      placeholder={props.nodeValues[location]}
-                      onChange={e => props.edit(e.target.value)} 
-                      onBlur={() => props.update(location)}
-                      onFocus={e => props.setValue(e)}
-                    />
-                  </li> 
-                ))
-              }
-              </div>
+                  {/* <li className="btn-li">{props.nodeValues[nodeIndex]}</li> */}
+
+                  { props.nodeChildren[nodeIndex] && props.nodeChildren[nodeIndex].length > 0 && showChildren &&
+                    props.nodeChildren[nodeIndex].map(childIndex => (
+                      <li 
+                        key={`${nodeIndex}${props.nodeValues[childIndex]}`}
+                        data-columns={`${nodeIndex}-${props.nodeValues[childIndex]}`} 
+                        className="flex flex-li"
+                      >
+                        { props.nodeChildren[childIndex] &&
+                          <button 
+                            className={props.childrenShowing[childIndex] ? "btn-li btn-li-active" : "btn-li rotated"} 
+                            onClick={() => props.toggleShowingChildAt(childIndex)} 
+                            >&#9660;
+                          </button> 
+                        }
+                        
+                        <button className="btn-li" onClick={() => props.addNode(null, childIndex)} >+</button>
+                        <input
+                          type="text"
+                          className="btn-li"
+                          placeholder={props.nodeValues[childIndex]}
+                          onChange={e => props.edit(e.target.value)} 
+                          onBlur={() => props.update(childIndex)}
+                          onFocus={e => props.setValue(e)}
+                        />
+                      </li>
+                    ))
+                  }
+                </ul>
+              )
             ))
           }
         </ul>
